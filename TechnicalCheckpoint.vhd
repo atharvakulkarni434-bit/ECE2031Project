@@ -38,11 +38,11 @@ end entity ADC_PERIPHERAL;
 architecture internals of ADC_PERIPHERAL is
 
     component LTC2308_ctrl is --this is like pseudo-defining an LTC2308 object
-    --very important, sort of like saying ‘this object exists in our ecosystem and looks like this’
-    -- we will later ‘instantiate’ a vers. of this ‘object’ by passing our signals to it later on!
+    --very important, sort of like saying "this object exists in our ecosystem and looks like this"
+    -- we will later "instantiate" a vers. of this "object" by passing our signals to it later on!
     --keep in mind these are software analogies, yet we are describing actual hardware being wired together!
 	 
-        generic (CLK_DIV : integer := 1); --setting this generic parameter as given by Kevin’s vhdl
+        generic (CLK_DIV : integer := 1); --setting this generic parameter as given by Kevin's vhdl
        -- the following declarations follow the syntax dictated by the object we wish to define
         port (
             clk : in std_logic;
@@ -111,7 +111,7 @@ begin
             if start_cnt = 249 then  -- When counter hits 249, fire a new trigger to start a new ADC reading, counter should reset
                 start_cnt <= 0;
                 start_sig <= '1';   -- one-cycle start pulse
-            else  -- If 249 hasn’t been reached yet, just keep counting, stay idle
+            else  -- If 249 hasn't been reached yet, just keep counting, stay idle
                 start_cnt <= start_cnt + 1;
                 start_sig <= '0';
             end if;
