@@ -118,5 +118,10 @@ begin
         end if;
     end process;
 
+
+	-- TODO*****
+	-- Complete the channel select process, allowing SCOMP user to choose the channel!
+	-- Complete the read process, for the SCOMP to actually READ the ADC result!
+
 end architecture internals;
 
