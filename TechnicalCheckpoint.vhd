@@ -18,20 +18,20 @@ use lpm.lpm_components.all;
 entity ADC_PERIPHERAL is
     port(
         -- Basic clock and reset for this peripheral to be clocked and reset by.
-        CLOCK      : in    std_logic;
-        RESETN     : in    std_logic;
+        CLOCK  : in    std_logic;
+        RESETN  : in    std_logic;
 
        -- Buses for SCOMP and this peripheral to communicate with each other: ADDR selects the peripheral, DATA carries data, READ and WRITE control read and write operations.
-        IO_ADDR    : in    std_logic_vector(10 downto 0);
-        IO_DATA    : inout std_logic_vector(15 downto 0);
-        IO_READ    : in    std_logic;
-        IO_WRITE   : in    std_logic;
+        IO_ADDR  : in std_logic_vector(10 downto 0);
+        IO_DATA  : inout std_logic_vector(15 downto 0);
+        IO_READ : in std_logic;
+        IO_WRITE : in std_logic;
 
         -- Ports used to communicate to the ADC: CONVST starts conversation, SCK clocks data, SDI sends commands, SDO returns conversation data.
-        ADC_CONVST : out   std_logic;
-        ADC_SCK    : out   std_logic;
-        ADC_SDI    : out   std_logic;
-        ADC_SDO    : in    std_logic
+        ADC_CONVST : out std_logic;
+        ADC_SCK : out std_logic;
+        ADC_SDI : out std_logic;
+        ADC_SDO : in std_logic
     );
 end entity ADC_PERIPHERAL;
 
@@ -45,16 +45,16 @@ architecture internals of ADC_PERIPHERAL is
         generic (CLK_DIV : integer := 1); --setting this generic parameter as given by Kevin’s vhdl
        -- the following declarations follow the syntax dictated by the object we wish to define
         port (
-            clk      : in  std_logic;
-            nrst     : in  std_logic;
-            start    : in  std_logic;
-            tx_data  : in  std_logic_vector(11 downto 0);
-            rx_data  : out std_logic_vector(11 downto 0);
-            busy     : out std_logic;
-            sclk     : out std_logic;
-            conv     : out std_logic;
-            mosi     : out std_logic;
-            miso     : in  std_logic
+            clk : in std_logic;
+            nrst : in std_logic;
+            start : in std_logic;
+            tx_data : in std_logic_vector(11 downto 0);
+            rx_data : out std_logic_vector(11 downto 0);
+            busy : out std_logic;
+            sclk : out std_logic;
+            conv : out std_logic;
+            mosi : out std_logic;
+            miso : in std_logic
         );
     end component;
 
@@ -62,16 +62,16 @@ architecture internals of ADC_PERIPHERAL is
     signal channel_reg  : std_logic_vector(2 downto 0);
 
     -- internal wires connecting this peripheral to the LTC_ctrl
-    signal tx_data_sig  : std_logic_vector(11 downto 0);
-    signal rx_data_sig  : std_logic_vector(11 downto 0);
-    signal busy_sig     : std_logic;
-    signal start_sig    : std_logic;
+    signal tx_data_sig : std_logic_vector(11 downto 0);
+    signal rx_data_sig : std_logic_vector(11 downto 0);
+    signal busy_sig : std_logic;
+    signal start_sig : std_logic;
 
     
-    signal start_cnt    : integer range 0 to 249; --counter for periodic pulsing/clocking
+    signal start_cnt : integer range 0 to 249; --counter for periodic pulsing/clocking
 
     -- bus driver enable so our peripheral can drive ADC result when needed, else left undriven to be reused
-    signal io_en        : std_logic;
+    signal io_en : std_logic;
 	 
 	 -- Setting up the opcode
 	 -- 12 bits overall, 6 bits configuration, 6 bits padding
@@ -117,11 +117,5 @@ begin
             end if;
         end if;
     end process;
-
-
-	-- TODO*****
-	-- Complete the channel select process, allowing SCOMP user to choose the channel!
-	-- Complete the read process, for the SCOMP to actually READ the ADC result!
-
 end architecture internals;
 
