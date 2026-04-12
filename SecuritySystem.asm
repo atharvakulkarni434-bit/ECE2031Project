@@ -1,4 +1,3 @@
-
 ORG 0
 Reset:
     IN   Channel0
