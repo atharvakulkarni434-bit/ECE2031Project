@@ -181,15 +181,21 @@ begin
         elsif rising_edge(CLOCK) then
             busy_prev <= busy_sig;
 
-            -- Falling edge of busy = conversion just finished
             if busy_prev = '1' and busy_sig = '0' then
-                ch_results(ch_counter) <= rx_data_sig;   -- latch result
-                if ch_counter = 7 then
-                    ch_counter <= 0;                     -- wrap around
-                else
-                    ch_counter <= ch_counter + 1;        -- advance to next channel
-                end if;
-            end if;
+    -- DOUT returns the result for the channel programmed in the
+    -- *previous* frame, so store under ch_counter - 1 (mod 8).
+    if ch_counter = 0 then
+        ch_results(7) <= rx_data_sig;
+    else
+        ch_results(ch_counter - 1) <= rx_data_sig;
+    end if;
+    -- Now advance to the next channel
+    if ch_counter = 7 then
+        ch_counter <= 0;
+    else
+        ch_counter <= ch_counter + 1;
+    end if;
+end if;
         end if;
     end process;
 
