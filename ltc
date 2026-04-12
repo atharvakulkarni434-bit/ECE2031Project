@@ -184,26 +184,23 @@ begin
 				end if;
 					 
 			elsif state = TRANSFER then
-				-- Sample MISO on rising edges
-				if sclk_rise = '1' then
-					rx_reg <= rx_reg(10 downto 0) & miso;
-				end if;
-					 
-				-- Shift MOSI on falling edges.
-				if sclk_fall = '1' then
-					tx_reg <= tx_reg(10 downto 0) & '0';
-					mosi   <= tx_reg(10); -- Put the next MSB onto the line
-				end if;
-					 
-			elsif state = HOLD then
-				-- Once the last bit is shifted, latch received data onto
-				-- the output bus.
-				if sclk_fall = '1' then
-					rx_data <= rx_reg;
-				end if;
-			end if;
-			
+    -- Sample MISO on rising edges
+    if sclk_rise = '1' then
+        rx_reg <= rx_reg(10 downto 0) & miso;
+        -- On the last bit, also forward directly to the output
+        -- so rx_data is valid the moment the transfer ends.
+        if bit_cnt = 0 then
+            rx_data <= rx_reg(10 downto 0) & miso;
+        end if;
+    end if;
+         
+    -- Shift MOSI on falling edges.
+    if sclk_fall = '1' then
+        tx_reg <= tx_reg(10 downto 0) & '0';
+        mosi   <= tx_reg(10);
+    end if;
 		end if;
+end if;
 	end process;
 
 end architecture internals;
