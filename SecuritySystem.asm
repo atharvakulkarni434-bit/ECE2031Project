@@ -2,7 +2,7 @@
 
 ORG 0
 Reset:
-	LOAD Channel0
+	IN Channel0
     OUT  Hex0
     JUMP Reset
 
