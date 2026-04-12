@@ -109,13 +109,13 @@ begin
     --
     -- conv_std_logic_vector converts ch_counter integer to a 3-bit std_logic_vector
     ---------------------------------------------------------------------------
-    tx_data_sig <= '1'                                        -- S/D single-ended
-                 & conv_std_logic_vector(ch_counter, 3)(2)    -- O/S channel MSB
-                 & conv_std_logic_vector(ch_counter, 3)(1)    -- S1  channel mid
-                 & conv_std_logic_vector(ch_counter, 3)(0)    -- S0  channel LSB
-                 & '1'                                        -- UNI unipolar
-                 & '0'                                        -- SLP no sleep
-                 & "000000";                                  -- padding zeros
+tx_data_sig <= '1'
+             & std_logic_vector(to_unsigned(ch_counter, 3))(2)
+             & std_logic_vector(to_unsigned(ch_counter, 3))(1)
+             & std_logic_vector(to_unsigned(ch_counter, 3))(0)
+             & '1'
+             & '0'
+             & "000000";
 
     ---------------------------------------------------------------------------
     -- Instantiate the SPI controller.
