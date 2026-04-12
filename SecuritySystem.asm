@@ -1,9 +1,4 @@
-ORG 0
-Reset:
-    IN   Channel0
-    OUT  Hex0
-    JUMP Reset
-
+; --- Constants ---
 Channel0:  EQU &HC0
 Channel1:  EQU &HC1
 Channel2:  EQU &HC2
@@ -17,3 +12,9 @@ LEDs:      EQU 001
 Timer:     EQU 002
 Hex0:      EQU 004
 Hex1:      EQU 005
+
+; --- Program ---
+            ORG 0
+Reset:      IN   Channel0
+            OUT  Hex0
+            JUMP Reset
