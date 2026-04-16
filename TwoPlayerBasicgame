@@ -1,0 +1,276 @@
+; PotGuess_Fixed.asm
+; Raise SW9 then lower it to start the round.
+; Player 1 (CH0)  -> Hex1 (left display)
+; Player 2 (CH7)  -> Hex0 (right display)
+; After 5 seconds -> same displays show result:
+;   0 = correct, A = too high, b = too low
+
+ORG 0
+
+Init:
+    LOADI 0
+    STORE RandNum
+    OUT Hex0
+    OUT Hex1
+    OUT LEDs
+
+; Spin random 0-99 while waiting for SW9 up
+WaitSW9Up:
+    LOAD RandNum
+    ADDI 1
+    STORE RandNum
+    SUB Const100
+    JNEG NoWrap
+    LOADI 0
+    STORE RandNum
+NoWrap:
+    IN Switches
+    AND Mask9
+    JZERO WaitSW9Up
+
+; Wait for SW9 back down
+WaitSW9Down:
+    IN Switches
+    AND Mask9
+    JNZ WaitSW9Down
+
+    LOAD RandNum
+    STORE Secret
+
+    LOADI 0
+    OUT Timer
+
+    LOADI &B011111      ; 5 LEDs on at start
+    OUT LEDs
+
+; ---------------------------------------------------------------
+; 5 second countdown loop
+; ---------------------------------------------------------------
+GameLoop:
+    ; Player 1 -> Hex1 (left)
+    IN CH0
+    CALL ScaleTo99
+    STORE P1Guess
+    CALL PackDecimal
+    OUT Hex1
+
+    ; Player 2 -> Hex0 (right)
+    IN CH7
+    CALL ScaleTo99
+    STORE P2Guess
+    CALL PackDecimal
+    OUT Hex0
+
+    ; Check timer
+    IN Timer
+    STORE TimerVal
+
+    LOAD TimerVal
+    SUB Const50
+    JPOS RoundOver
+    JZERO RoundOver
+
+    ; Update LEDs
+    LOAD TimerVal
+    SUB Const10
+    JNEG LED5
+    LOAD TimerVal
+    SUB Const20
+    JNEG LED4
+    LOAD TimerVal
+    SUB Const30
+    JNEG LED3
+    LOAD TimerVal
+    SUB Const40
+    JNEG LED2
+    JUMP LED1
+
+LED5: LOADI &B011111
+    OUT LEDs
+    JUMP GameLoop
+LED4: LOADI &B001111
+    OUT LEDs
+    JUMP GameLoop
+LED3: LOADI &B000111
+    OUT LEDs
+    JUMP GameLoop
+LED2: LOADI &B000011
+    OUT LEDs
+    JUMP GameLoop
+LED1: LOADI &B000001
+    OUT LEDs
+    JUMP GameLoop
+
+; ---------------------------------------------------------------
+; Round over
+; ---------------------------------------------------------------
+RoundOver:
+    LOADI 0
+    OUT LEDs
+
+    ; Player 1 result
+    LOAD P1Guess
+    SUB Secret
+    JNEG P1Low
+    JPOS P1High
+    LOADI 0
+    STORE P1Result
+    JUMP DoP2
+P1High:
+    LOADI 10
+    STORE P1Result
+    JUMP DoP2
+P1Low:
+    LOADI 11
+    STORE P1Result
+
+    ; Player 2 result
+DoP2:
+    LOAD P2Guess
+    SUB Secret
+    JNEG P2Low
+    JPOS P2High
+    LOADI 0
+    STORE P2Result
+    JUMP ShowResults
+P2High:
+    LOADI 10
+    STORE P2Result
+    JUMP ShowResults
+P2Low:
+    LOADI 11
+    STORE P2Result
+
+ShowResults:
+    ; Show P1 result on Hex1: multiply by 16 so it shows in upper digit
+    LOAD P1Result
+    STORE ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    OUT Hex1            ; upper digit = 0/A/b, lower digit = 0
+
+    ; Show P2 result on Hex0
+    LOAD P2Result
+    STORE ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    OUT Hex0
+
+Done:
+    JUMP Done
+
+; ---------------------------------------------------------------
+; ScaleTo99: AC (0-4095) -> AC (0-99)
+; ---------------------------------------------------------------
+ScaleTo99:
+    STORE ScaleTemp
+    LOADI 0
+    STORE ScaleQuot
+ScaleLoop:
+    LOAD ScaleTemp
+    SUB Const41
+    JNEG ScaleDone
+    STORE ScaleTemp
+    LOAD ScaleQuot
+    ADDI 1
+    STORE ScaleQuot
+    JUMP ScaleLoop
+ScaleDone:
+    LOAD ScaleQuot
+    RETURN
+
+; ---------------------------------------------------------------
+; PackDecimal: AC (0-99) -> AC (tens*16 + ones)
+; ---------------------------------------------------------------
+PackDecimal:
+    STORE PackTemp
+    LOADI 0
+    STORE PackTens
+PackLoop:
+    LOAD PackTemp
+    SUB Const10
+    JNEG PackDone
+    STORE PackTemp
+    LOAD PackTens
+    ADDI 1
+    STORE PackTens
+    JUMP PackLoop
+PackDone:
+    LOAD PackTens
+    STORE ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD ShiftTemp
+    ADD PackTemp
+    RETURN
+
+; Variables
+RandNum:   DW 0
+Secret:    DW 0
+P1Guess:   DW 0
+P2Guess:   DW 0
+P1Result:  DW 0
+P2Result:  DW 0
+TimerVal:  DW 0
+ScaleTemp: DW 0
+ScaleQuot: DW 0
+PackTemp:  DW 0
+PackTens:  DW 0
+ShiftTemp: DW 0
+
+; Constants
+Const10:   DW 10
+Const20:   DW 20
+Const30:   DW 30
+Const40:   DW 40
+Const41:   DW 41
+Const50:   DW 50
+Const100:  DW 100
+Mask9:     DW &B1000000000
+
+; IO
+CH0:      EQU &HC0
+CH7:      EQU &HC7
+Switches: EQU 000
+LEDs:     EQU 001
+Timer:    EQU 002
+Hex0:     EQU 004
+Hex1:     EQU 005
