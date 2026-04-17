@@ -246,11 +246,12 @@ PDone:
     RETURN
 
 Delay:
-    LOADI 4000      
-DLoop:
-    SUBI 1
-    JPOS DLoop
-    RETURN
+	OUT    Timer
+DelayLoop:
+	IN     Timer
+	ADDI   -30
+	JNEG   DelayLoop
+	RETURN
 
 ; --- DATA ---
 P1Target:  DW 0
