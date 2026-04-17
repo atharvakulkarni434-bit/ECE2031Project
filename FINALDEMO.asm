@@ -155,17 +155,17 @@ GameOver:
 	LOADI 1
 	SHIFT 12
 	ADDI  273
-	OUT Hex1
+	OUT Hex0
 CheckP2Win:
     ; Check if P2 won
     LOAD P2Result
     JNZ WaitReset
     LOADI 34        ; 34 decimal = 0x22, shows "22"
-    OUT Hex0
+    OUT Hex1
 	LOADI 1
 	SHIFT 13
 	ADDI -546
-	OUT Hex1
+	OUT Hex0
 
 WaitReset:
 	CALL FlashLeds
