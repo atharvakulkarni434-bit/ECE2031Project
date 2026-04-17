@@ -249,7 +249,7 @@ Delay:
 	OUT    Timer
 DelayLoop:
 	IN     Timer
-	ADDI   -30
+	ADDI   -15
 	JNEG   DelayLoop
 	RETURN
 
