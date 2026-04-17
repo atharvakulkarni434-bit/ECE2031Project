@@ -152,12 +152,20 @@ GameOver:
     JNZ CheckP2Win
     LOADI 17        ; 17 decimal = 0x11, shows "11"
     OUT Hex1
+	LOADI 1
+	SHIFT 12
+	ADDI  273
+	OUT Hex1
 CheckP2Win:
     ; Check if P2 won
     LOAD P2Result
     JNZ WaitReset
     LOADI 34        ; 34 decimal = 0x22, shows "22"
     OUT Hex0
+	LOADI 1
+	SHIFT 13
+	ADDI -546
+	OUT Hex1
 
 WaitReset:
 	CALL FlashLeds
