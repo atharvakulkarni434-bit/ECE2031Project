@@ -160,6 +160,7 @@ CheckP2Win:
     OUT Hex0
 
 WaitReset:
+	CALL FlashLeds
     IN Switches
     AND Mask9
     JNZ WaitReset       
@@ -253,6 +254,23 @@ DelayLoop:
 	JNEG   DelayLoop
 	RETURN
 
+FlashDelay:
+	OUT    Timer
+FlashDelayLoop:
+	IN     Timer
+	ADDI   -5
+	JNEG   FlashDelayLoop
+	RETURN
+
+FlashLeds:
+	LOAD MaskLedsOn
+    OUT  LEDs
+    CALL FlashDelay
+    LOAD MaskLedsOff
+    OUT  LEDs
+    CALL FlashDelay
+    RETURN
+
 ; --- DATA ---
 P1Target:  DW 0
 P2Target:  DW 0
@@ -276,6 +294,8 @@ Const50:   DW 50
 Mask7:     DW &B0010000000 
 Mask8:     DW &B0100000000 
 Mask9:     DW &B1000000000 
+MaskLedsOn: DW &B101010101
+MaskLedsOff:     DW &B000000000
 
 CH0:       EQU &HC0
 CH7:       EQU &HC7
