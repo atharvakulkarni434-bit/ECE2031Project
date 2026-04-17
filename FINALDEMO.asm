@@ -162,9 +162,9 @@ CheckP2Win:
     JNZ WaitReset
     LOADI 34        ; 34 decimal = 0x22, shows "22"
     OUT Hex1
-	LOADI 1
-	SHIFT 13
-	ADDI -546
+	LOADI 34
+	SHIFT 8
+	ADDI 34
 	OUT Hex0
 
 WaitReset:
