@@ -235,23 +235,15 @@ PLoop:
     JUMP PLoop
 PDone:
     LOAD PackTens
-    STORE ShiftTemp  
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
-    ADD ShiftTemp
+    STORE ShiftTemp
+    CALL Mul15ShiftTemp
     ADD PackTemp
+    RETURN
+
+Mul15ShiftTemp:
+	LOAD ShiftTemp
+	SHIFT &H4
+    SUB ShiftTemp
     RETURN
 
 Delay:
